@@ -1,0 +1,105 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: users
+    // Document ID: userId (must match auth.uid)
+    // Fields:
+    //   - uid: string (required) - Must match auth.uid
+    //   - email: string (required)
+    //   - name: string (required)
+    //   - mood: string (optional)
+    //   - createdAt: timestamp (required, immutable)
+    //
+    // Subcollection: watchlist
+    // Document ID: contentId
+    // Fields:
+    //   - contentId: string (required)
+    //   - addedAt: timestamp (required)
+    //
+    // Subcollection: history
+    // Document ID: contentId
+    // Fields:
+    //   - contentId: string (required)
+    //   - progress: number (required, >= 0)
+    //   - lastWatchedAt: timestamp (required)
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+    
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string &&
+        dateStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z?$");
+    }
+
+    // Validation Functions
+    function isValidUser() {
+      let data = request.resource.data;
+      let hasRequired = data.keys().hasAll(['uid', 'email', 'name', 'createdAt']);
+      let allowedKeys = ['uid', 'email', 'name', 'createdAt', 'mood'];
+      
+      return hasOnlyAllowedFields(allowedKeys) && hasRequired &&
+             data.uid == request.auth.uid &&
+             data.email is string && data.email.size() > 0 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             isValidDateString(data.createdAt) &&
+             (!('mood' in data) || (data.mood is string && data.mood.size() <= 50));
+    }
+
+    function isValidWatchlistItem() {
+      let data = request.resource.data;
+      return hasOnlyAllowedFields(['contentId', 'addedAt']) &&
+             data.keys().hasAll(['contentId', 'addedAt']) &&
+             data.contentId is string && data.contentId.size() > 0 && data.contentId.size() <= 100 &&
+             isValidDateString(data.addedAt);
+    }
+
+    function isValidHistoryItem() {
+      let data = request.resource.data;
+      return hasOnlyAllowedFields(['contentId', 'progress', 'lastWatchedAt']) &&
+             data.keys().hasAll(['contentId', 'progress', 'lastWatchedAt']) &&
+             data.contentId is string && data.contentId.size() > 0 && data.contentId.size() <= 100 &&
+             data.progress is number && data.progress >= 0 &&
+             isValidDateString(data.lastWatchedAt);
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser();
+      allow update: if isOwner(userId) && isValidUser() && areImmutableFieldsUnchanged(['uid', 'createdAt']);
+      
+      match /watchlist/{contentId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidWatchlistItem();
+        allow update: if isOwner(userId) && isValidWatchlistItem() && areImmutableFieldsUnchanged(['contentId', 'addedAt']);
+        allow delete: if isOwner(userId);
+      }
+      
+      match /history/{contentId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidHistoryItem();
+        allow update: if isOwner(userId) && isValidHistoryItem() && areImmutableFieldsUnchanged(['contentId']);
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email address" },
+        "name": { "type": "string", "description": "User display name" },
+        "mood": { "type": "string", "description": "Current selected mood for recommendations" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["uid", "email", "name"]
+    },
+    "WatchlistItem": {
+      "title": "Watchlist Item",
+      "description": "An item saved to the user's watchlist",
+      "type": "object",
+      "properties": {
+        "contentId": { "type": "string" },
+        "addedAt": { "type": "timestamp" }
+      },
+      "required": ["contentId", "addedAt"]
+    },
+    "HistoryItem": {
+      "title": "History Item",
+      "description": "Watch history for a user",
+      "type": "object",
+      "properties": {
+        "contentId": { "type": "string" },
+        "progress": { "type": "number", "description": "Progress in seconds" },
+        "lastWatchedAt": { "type": "timestamp" }
+      },
+      "required": ["contentId", "progress", "lastWatchedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/users/{userId}/watchlist/{contentId}": {
+      "schema": { "$ref": "#/entities/WatchlistItem" },
+      "description": "User's saved watchlist items"
+    },
+    "/users/{userId}/history/{contentId}": {
+      "schema": { "$ref": "#/entities/HistoryItem" },
+      "description": "User's viewing history"
+    }
+  }
+}

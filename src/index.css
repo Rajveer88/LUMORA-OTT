@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Orbitron:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Rajdhani:wght@300;400;500;600;700&family=Caveat+Brush&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-bg-theme: #050507;
+  --color-accent-purple: #9D00FF;
+  --color-accent-cyan: #00F0FF;
+  --color-glass: rgba(255, 255, 255, 0.04);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-text-main: #FFFFFF;
+  --color-text-dim: #A0A0A0;
+  
+  /* Typography System */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-playfair: 'Playfair Display', serif;
+  --font-cinzel: 'Cinzel', serif;
+  --font-rajdhani: 'Rajdhani', sans-serif;
+  --font-caveat: 'Caveat Brush', cursive;
+}
+
+body {
+  background-color: var(--color-bg-theme);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Film Grain Overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+.mesh-gradient {
+  position: fixed;
+  top: -20%;
+  right: -10%;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(157, 0, 255, 0.15) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Shimmer Skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite linear;
+}
+
+/* Ambient Pulse for Watch Player */
+@keyframes ambientPulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+
+.ambient-glow {
+  animation: ambientPulse 3s infinite ease-in-out;
+}
+
+/* Progress fill for downloads */
+@keyframes downloadFill {
+  from { stroke-dashoffset: var(--circumference, 88); }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Hide scrollbar for clean ui */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-theme); 
+}
+::-webkit-scrollbar-thumb {
+  background: #333; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
