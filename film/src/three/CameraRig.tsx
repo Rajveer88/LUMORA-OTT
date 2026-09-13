@@ -47,8 +47,8 @@ const KNOTS: Knot[] = [
   { t: 24.5, p: [0, 2.15, 22.6], look: [0, 2.15, 25.2], roll: 0, fov: 52 },
   { t: 26.2, p: [-1.4, 2.5, 22.9], look: [-0.4, 2.1, 25.0], roll: 1, fov: 50 },
   { t: 27.6, p: [-3.6, 2.7, 23.6], look: [-1.0, 2.05, 24.8], roll: -2, fov: 49 },
-  // collapse + whip back home
-  { t: 28.7, p: [-4.4, 3.0, 24.4], look: [-0.8, 2.2, 24.4], roll: -5, fov: 57 },
+  // collapse + whip back home (stay clear of the curved panel wall)
+  { t: 28.7, p: [-2.2, 3.0, 21.9], look: [-1.0, 2.2, 24.8], roll: -4, fov: 56 },
   { t: 29.3, p: [1.4, 3.6, 10.5], look: [0, 2.1, 1.5], roll: -2, fov: 54 },
   // WORKBENCH — the builder among the machines
   { t: 29.9, p: [4.3, 2.7, -5.9], look: [0, 1.55, 1.2], roll: 1, fov: 48 },
